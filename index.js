@@ -1,7 +1,7 @@
-const express = require("express");
-const app = express();
-const fs = require("fs");
+import express from "express";
+import fs from "fs";
 
+const app = express();
 app.use(express.text({ type: "*/*" }));
 
 app.post("/", (req, res) => {
@@ -10,14 +10,10 @@ app.post("/", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    if (fs.existsSync("data.txt")) {
-        res.type("text/plain");
-        res.send(fs.readFileSync("data.txt", "utf8"));
-    } else {
-        res.type("text/plain");
-        res.send("");
-    }
+    if (!fs.existsSync("data.txt")) return res.send("");
+    res.type("text/plain");
+    res.send(fs.readFileSync("data.txt", "utf8"));
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port);
+app.listen(port, () => console.log("Server running on " + port));
