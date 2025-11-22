@@ -1,25 +1,23 @@
-//Thanks to some guy from an javascript scripting website
 const express = require("express");
-const bodyParser = require("body-parser");
 const app = express();
-const PORT = 3000;
+const fs = require("fs");
 
-
-app.use(bodyParser.text({ type: "*/*" }));
-
-let storedScript = "";
-
+app.use(express.text({ type: "*/*" }));
 
 app.post("/", (req, res) => {
-    const newScript = req.body || "";
-
-    const previousScript = storedScript; 
-
-    storedScript = newScript; 
-    res.type("text/plain");
-    res.send(previousScript);
+    fs.writeFileSync("data.txt", req.body);
+    res.send("OK");
 });
 
-app.listen(PORT, () => {
-    console.log(`String API running on port ${PORT}`);
+app.get("/", (req, res) => {
+    if (fs.existsSync("data.txt")) {
+        res.type("text/plain");
+        res.send(fs.readFileSync("data.txt", "utf8"));
+    } else {
+        res.type("text/plain");
+        res.send("");
+    }
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port);
