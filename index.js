@@ -1,19 +1,25 @@
-const express = require('express');
+const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
-app.use(express.json());
+const PORT = 3000;
 
-let storedStrings = [];
+// allow multiline body
+app.use(bodyParser.text({ type: "*/*" }));
 
-app.post('/add', (req, res) => {
-    const { text } = req.body;
-    if (!text) return res.status(400).send({ error: 'No text provided' });
-    storedStrings.push(text);
-    res.send({ success: true, stored: text });
+let storedScript = "";
+
+// POST ONLY — stores new script and returns old one
+app.post("/", (req, res) => {
+    const newScript = req.body || "";
+
+    const previousScript = storedScript; // return last stored script
+
+    storedScript = newScript; // update storage
+
+    res.type("text/plain");
+    res.send(previousScript);
 });
 
-app.get('/get', (req, res) => {
-    res.send({ strings: storedStrings });
+app.listen(PORT, () => {
+    console.log(`String API running on port ${PORT}`);
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
